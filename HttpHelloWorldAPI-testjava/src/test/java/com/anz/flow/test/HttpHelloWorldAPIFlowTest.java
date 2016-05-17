@@ -4,6 +4,7 @@
 package com.anz.flow.test;
 
 import static org.junit.Assert.assertEquals;
+
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
@@ -24,7 +25,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import com.anz.HttpHelloWorldAPI.transform.pojo.NumbersInput;
-import com.anz.HttpHelloWorldAPI.transform.pojo.Result;
 import com.anz.common.dataaccess.models.iib.Operation;
 import com.anz.common.test.FlowTest;
 import com.anz.common.transform.TransformUtils;
@@ -54,9 +54,7 @@ public class HttpHelloWorldAPIFlowTest extends FlowTest {
 	private static final String injectNodeName ="HTTP Input";
 	
 	// Choose message format for corresponding HTTP method
-	//private static final String MESSAGE_FORMAT = "DeleteMessageFormat.xml";
-	private static final String MESSAGE_FORMAT = "PostMessageFormat.xml";
-	//private static final String MESSAGE_FORMAT = "GetMessageFormat.xml";
+	private static final String MESSAGE_FORMAT = "MessageFormat.xml";
 	
 	@Override
 	@Before
@@ -96,52 +94,22 @@ public class HttpHelloWorldAPIFlowTest extends FlowTest {
 	
 	@Test
 	public void testMainFlow() throws ConfigManagerProxyPropertyNotInitializedException, ConfigManagerProxyLoggedException, IOException, XPathExpressionException, SAXException, ParserConfigurationException, TransformerException, JSONException {
+		
 		injectData();
-		
-		// Choose Method to test corresponding HTTP method and message format
-		//testGetResult();
-		testPostResult();
-		//testDeleteResult();
+
+		testOutput();
 
 	}
 	
 	
-	private void testDeleteResult() throws ConfigManagerProxyPropertyNotInitializedException, XPathExpressionException, SAXException, IOException, ParserConfigurationException {
+	private void testOutput() throws ConfigManagerProxyPropertyNotInitializedException, XPathExpressionException, SAXException, IOException, ParserConfigurationException {
 
-		List<RecordedTestData> dataList = getTestDataList("Delete");
+		List<RecordedTestData> dataList = getTestDataList("HTTP Reply", true);
 		
 		String json = getNodeOutputJsonStringFromBlob(dataList.get(0));
-		Result out = gson.fromJson(json, Result.class);
+		NumbersInput out = gson.fromJson(json, NumbersInput.class);		
 		
-		
-		assertEquals("Java_SpringBoot", out.getImeplementation());
-		assertEquals("107", out.getResult());
-		
-	}
-
-	private void testPostResult() throws ConfigManagerProxyPropertyNotInitializedException, XPathExpressionException, SAXException, IOException, ParserConfigurationException {
-
-		List<RecordedTestData> dataList = getTestDataList("Post");
-		
-		String json = getNodeOutputJsonStringFromBlob(dataList.get(0));
-		Result out = gson.fromJson(json, Result.class);
-		
-		
-		assertEquals("Java_SpringBoot", out.getImeplementation());
-		assertEquals("209", out.getResult());
-		
-	}
-
-	private void testGetResult() throws ConfigManagerProxyPropertyNotInitializedException, XPathExpressionException, SAXException, IOException, ParserConfigurationException {
-
-		List<RecordedTestData> dataList = getTestDataList("Get");
-		
-		String json = getNodeOutputJsonStringFromBlob(dataList.get(0));
-		
-		JsonNode root = objectMapper.readTree(json);
-		
-		String element = root.asText(); 
-		assertEquals("Hello World from Java_SpringBoot", element);
+		assertEquals("Hello World!", out.getText());
 		
 	}
 
